@@ -1,10 +1,10 @@
 const url = require('url');
 const Connection = require('pg').Pool;
 const myconnect = new Connection({
-    user:'lolhjxpokcsecd',
-	host:'ec2-52-7-115-250.compute-1.amazonaws.com',
-	database:'d4juj45rq7vo7c',
-	password:'ea860c5f937749f03df02d976a849a39a82ac570ee10c4faab2be3ae165b0be8',
+    user:'rdmtadktcwfnrf',
+	host:'ec2-54-157-100-65.compute-1.amazonaws.com',
+	database:'d5f2s748mvbeuf',
+	password:'96e09095a6b5d7885c903306ec94780d2da2165735bcf0a4378574fb98cb2d88',
 	port:'5432',
 	ssl: {
 		rejectUnauthorized: false,
@@ -111,7 +111,7 @@ router.get('/viewcustomer',(req,res)=>{
 					</ul>
 				</div>
 				<div>
-					<table style="width:100%">
+					<table>
 						<tr>
 						  <th>${queryResult.fields[0].name}</th>
 						  <th>${queryResult.fields[1].name}</th>
@@ -283,7 +283,7 @@ router.get('/viewproduct',(req,res)=>{
 					</ul>
 				</div>
 				<div>
-					<table style="width:100%">
+					<table>
 						<tr>
 						  <th>${queryResult.fields[0].name}</th>
 						  <th>${queryResult.fields[1].name}</th>
@@ -372,7 +372,7 @@ router.get('/viewcategory',(req,res)=>{
 					</ul>
 				</div>
 				<div>
-					<table style="width:100%">
+					<table>
 						<tr>
 						  <th>${queryResult.fields[0].name}</th>
 						  <th>${queryResult.fields[1].name}</th>
@@ -480,8 +480,8 @@ router.get('/checkout',(req,res) => {
 			});
 			break;
 		case"Submit":
-		var queryString = `INSERT INTO public."invoice" (id,date,productid,cusid,price,quantity,total) 
-		VALUES ('${qparams.invoiceid}','${qparams.invoicedate}','${qparams.productid}','${qparams.cusid}','${qparams.price}','${qparams.quantity}','${qparams.total}')`; 
+		var queryString = `INSERT INTO public."invoice" (id,date,productid,cusid,quantity,total) 
+		VALUES ('${qparams.invoiceid}','${qparams.invoicedate}','${qparams.productid}','${qparams.cusid}','${qparams.quantity}','${qparams.total}')`; 
 		console.log(queryString);
 		myconnect.query(queryString, (error,results) => {if (error)
 		{

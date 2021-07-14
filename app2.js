@@ -304,6 +304,7 @@ router.get('/viewproduct',(req,res)=>{
 //end product
 
 //category
+
 router.get('/category',(req,res)=>{
 	var q = url.parse(req.url,true);
 	console.log(q);

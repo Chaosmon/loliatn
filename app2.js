@@ -1,10 +1,10 @@
 const url = require('url');
 const Connection = require('pg').Pool;
 const myconnect = new Connection({
-    user:'lolhjxpokcsecd',
-	host:'ec2-52-7-115-250.compute-1.amazonaws.com',
-	database:'d4juj45rq7vo7c',
-	password:'ea860c5f937749f03df02d976a849a39a82ac570ee10c4faab2be3ae165b0be8',
+    user:'rdmtadktcwfnrf',
+	host:'ec2-54-157-100-65.compute-1.amazonaws.com',
+	database:'d5f2s748mvbeuf',
+	password:'96e09095a6b5d7885c903306ec94780d2da2165735bcf0a4378574fb98cb2d88',
 	port:'5432',
 	ssl: {
 		rejectUnauthorized: false,
@@ -39,13 +39,11 @@ app.use(express.static(path.join(__dirname,'public')));
 router.get('/home',(req,res)=>{
    res.sendFile(path.join(__dirname +'/home.html'));
 });
-//customer
+
 router.get('/customer',(req,res)=>{
 	var q = url.parse(req.url,true);
-	console.log(q);
 	var qparams = q.query;
 	console.log(qparams);
-	var undef;
 	if (qparams.cusid && qparams.cusname && qparams.cusaddr)
 	{
 		console.log(qparams);
@@ -111,7 +109,7 @@ router.get('/viewcustomer',(req,res)=>{
 					</ul>
 				</div>
 				<div>
-					<table style="width:100%">
+					<table>
 						<tr>
 						  <th>${queryResult.fields[0].name}</th>
 						  <th>${queryResult.fields[1].name}</th>
@@ -129,7 +127,7 @@ router.get('/viewcustomer',(req,res)=>{
 	</html>`);
 });
 });
-//end customer
+
 
 
 router.get('/product',(req,res)=>{
@@ -214,10 +212,8 @@ router.get('/product',(req,res)=>{
 	</body>
 	</html>`);
 	var q = url.parse(req.url,true);
-	console.log(q);
 	var qparams = q.query;
 	console.log(qparams);
-	var undef;
 	if (qparams.productid && qparams.productname && qparams.category)
 	{
 		console.log(qparams);
@@ -283,7 +279,7 @@ router.get('/viewproduct',(req,res)=>{
 					</ul>
 				</div>
 				<div>
-					<table style="width:100%">
+					<table>
 						<tr>
 						  <th>${queryResult.fields[0].name}</th>
 						  <th>${queryResult.fields[1].name}</th>
@@ -306,23 +302,18 @@ router.get('/viewproduct',(req,res)=>{
 //category
 router.get('/category',(req,res)=>{
 	var q = url.parse(req.url,true);
-	console.log(q);
 	var qparams = q.query;
-	console.log(qparams);
-	var undef;
 	if (qparams.cateid && qparams.catename && qparams.catedesc)
 	{
 		console.log(qparams);
-		var queryString = `INSERT INTO public."category" (cateid,catename,catedesc) 
-			VALUES ('${qparams.cateid}','${qparams.catename}','${qparams.catedesc}')`; 
-		console.log(queryString);
+		var queryString = `INSERT INTO public."category" (cateid,catename) 
+			VALUES ('${qparams.cateid}','${qparams.catename}')`; 
 		myconnect.query(queryString, (error,results) => {if (error)
 			{
 				console.log(error);
 				res.send('Error:Your Insert query has been Failed');
 				return;
 			}
-				else console.log(results);
 		});
 		res.sendFile(path.join(__dirname + '/category.html'));
 	}
@@ -346,7 +337,6 @@ router.get('/viewcategory',(req,res)=>{
 		tableRow = tableRow + `<tr>
 			<td >${queryResult.rows[i].cateid}</td>
 			<td >${queryResult.rows[i].catename}</td>
-			<td >${queryResult.rows[i].catedesc}</td>
 		</tr>`;
 	}
 	res.send( `<!DOCTYPE html>
@@ -372,11 +362,10 @@ router.get('/viewcategory',(req,res)=>{
 					</ul>
 				</div>
 				<div>
-					<table style="width:100%">
+					<table>
 						<tr>
 						  <th>${queryResult.fields[0].name}</th>
 						  <th>${queryResult.fields[1].name}</th>
-						  <th>${queryResult.fields[2].name}</th>
 						</tr>
 						${tableRow}
 					  </table>
@@ -391,117 +380,104 @@ router.get('/viewcategory',(req,res)=>{
 
 
 router.get('/checkout',(req,res) => {
-	//the same as res.write/res.end in previous labs (without using Express)
-	//no need to write to HTTP response header: Content-type
 	var q = url.parse(req.url,true);
-	console.log(q);
 	var qparams = q.query;
-	console.log(qparams);
-	var undef;
 	if (qparams.form)
 	{
 		console.log(qparams.form);
 		switch (qparams.form)
 		{
-		//Situation 1. checkout?invoiceid=&invoicedate=&productid=&quantity=&form=AddProduct
-		case "Add":
-			myconnect.query(`SELECT * FROM public."product" WHERE public."product".id = '${qparams.productid}'`,
-			(error,results) => {
-				if (error)
-				{
-					console.log(error);
-					returns;
-				}
-				var productPrice = results.rows[0].price;
-				var productName = results.rows[0].product_name;
-				console.log(productPrice);
-				console.log(productName);
-				var total = qparams.quantity * productPrice
-				myconnect.query(`SELECT * FROM public."customer" WHERE public."customer".phone = '${qparams.phone}'`,
-				(error,results1) => {
-				if (error)
-				{
-					console.log(error);
-					returns1;
-				}
-				res.send(`<!DOCTYPE html>
-				<html lang="en">
-				<meta charset="UTF-8">
-				<meta http-equiv="X-UA-Compatible" content="IE=edge">
-				<meta name="viewport" content="width=device-width, initial-scale=1.0">
-				<link rel="stylesheet" href="/style.css">
-					<head> <title>Check-out/Invoice</title></head>
-					<body>
-					<header>
-					<div>
-						<div><h1>ATN SALES MANAGEMENT</h1></div>
+			case "Add":
+				myconnect.query(`SELECT * FROM public."product" WHERE public."product".id = '${qparams.productid}'`,
+				(error,results) => {
+					if (error)
+					{
+						console.log(error);
+					}
+					var productPrice = results.rows[0].price;
+					var productName = results.rows[0].product_name;
+					var total = qparams.quantity * productPrice
+					myconnect.query(`SELECT * FROM public."customer" WHERE public."customer".phone = '${qparams.phone}'`,
+					(error,results1) => {
+					if (error)
+					{
+						console.log(error);
+					}
+					res.send(`<!DOCTYPE html>
+					<html lang="en">
+					<meta charset="UTF-8">
+					<meta http-equiv="X-UA-Compatible" content="IE=edge">
+					<meta name="viewport" content="width=device-width, initial-scale=1.0">
+					<link rel="stylesheet" href="/style.css">
+						<head> <title>Check-out/Invoice</title></head>
+						<body>
+						<header>
 						<div>
-							<ul>
-								<li><a href="home"> Home</a></li>
-								<li><a href="viewproduct"> View Product</a></li>
-								<li><a href="viewcustomer"> View Customer</a></li>
-								<li><a href="viewcategory"> View Category</a></li>
-							</ul>
+							<div><h1>ATN SALES MANAGEMENT</h1></div>
+							<div>
+								<ul>
+									<li><a href="home"> Home</a></li>
+									<li><a href="viewproduct"> View Product</a></li>
+									<li><a href="viewcustomer"> View Customer</a></li>
+									<li><a href="viewcategory"> View Category</a></li>
+								</ul>
+							</div>
 						</div>
-					</div>
-				</header>
-					<form action="checkout" method="get">
-						<div>	
-							<h1>Check-out/Invoice Information</h1>
-							<label>Invoice ID</label>
-							<input type="text" name="invoiceid" value="${qparams.invoiceid}">
-							<label>Invoice Date</label>
-							<input type="date" name="invoicedate" value="${qparams.invoicedate}">
-							<h1>Check-out/Invoice Details</h1>
-							<label>Product ID</label>
-							<input type="text" name="productid" value="${qparams.productid}">
-							<label>Product Name</label>
-							<input type="text" name="productname" value="${results.rows[0].product_name}">
-							<label>Price</label>
-							<input type="text" name="price" value="${results.rows[0].price}">
-							<label>Quantity</label>
-							<input type="text" name="quantity" value="${qparams.quantity}">
-							<label>Phone</label>
-							<input type="text" name="phone" value="${qparams.phone}">
-							<label>Customer ID</label>
-							<input type="text" name="cusid" value="${results1.rows[0].customerid}">
-							<label>Name</label>
-							<input type="text" name="cusname" value="${results1.rows[0].customer_name}">
-							<br><br>
-							<label>Total</label>
-							<input type="text" name="total" value="${total}">
-							<br><br>
-							<input type="submit" name="form" value="Submit">
-						</div>
-					</form>
-					</body>
-				</html>`);
+					</header>
+						<form action="checkout" method="get">
+							<div>	
+								<h1>Check-out/Invoice Information</h1>
+								<label>Invoice ID</label>
+								<input type="text" name="invoiceid" value="${qparams.invoiceid}">
+								<label>Invoice Date</label>
+								<input type="date" name="invoicedate" value="${qparams.invoicedate}">
+								<h1>Check-out/Invoice Details</h1>
+								<label>Product ID</label>
+								<input type="text" name="productid" value="${qparams.productid}">
+								<label>Product Name</label>
+								<input type="text" name="productname" value="${results.rows[0].product_name}">
+								<label>Price</label>
+								<input type="text" name="price" value="${results.rows[0].price}">
+								<label>Quantity</label>
+								<input type="text" name="quantity" value="${qparams.quantity}">
+								<label>Customer ID</label>
+								<input type="text" name="cusid" value="${results1.rows[0].customerid}">
+								<label>Name</label>
+								<input type="text" name="cusname" value="${results1.rows[0].customer_name}">
+								<label>Phone</label>
+								<input type="text" name="phone" value="${qparams.phone}">
+								<label>Address</label>
+								<input type="text" name="address" value="${results1.rows[0].address}">
+								<label>Email</label>
+								<input type="text" name="email" value="${results1.rows[0].email}">
+								<br><br>
+								<label>Total</label>
+								<input type="text" name="total" value="${total}">
+								<br><br>
+								<input type="submit" name="form" value="Submit">
+							</div>
+						</form>
+						</body>
+					</html>`);
+					});
 				});
-			});
-			break;
-		case"Submit":
-		var queryString = `INSERT INTO public."invoice" (id,date,productid,cusid,price,quantity,total) 
-		VALUES ('${qparams.invoiceid}','${qparams.invoicedate}','${qparams.productid}','${qparams.cusid}','${qparams.price}','${qparams.quantity}','${qparams.total}')`; 
-		console.log(queryString);
-		myconnect.query(queryString, (error,results) => {if (error)
-		{
-			console.log(error);
-			res.send('Error:Your Insert query has been Failed');
-			return;
-		}
-			else console.log(results);
-			res.sendFile(path.join(__dirname + '/checkout.html'));	
-	});
+				break;
 
-		break;
-		//Situation 2. checkout?invoiceid=&invoicedate=&productid=&quantity=&form_submit=Submit
-		default:
-			break;
+			case"Submit":
+			myconnect.query(`INSERT INTO public."invoice" (id, date, productid, cusid, quantity, total) VALUES ('${qparams.invoiceid}','${qparams.invoicedate}',
+			'${qparams.productid}','${qparams.cusid}','${qparams.quantity}','${qparams.total}')`, 
+			(error) => {
+				if (error){
+				console.log(error);
+				}
+				res.sendFile(path.join(__dirname + '/checkout.html'));	
+			}); break;
+
+			default: break;
 		}
-	}
-	else
+	} else{
 		res.sendFile(path.join(__dirname + '/checkout.html'));
-	//res.send('This is CART page');
+	}
 });
 app.use('/', router);
 
